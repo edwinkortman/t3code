@@ -211,6 +211,21 @@ export const GrokIcon: Icon = ({ className, ...props }) => (
   </svg>
 );
 
+// TODO(omp): real Oh My Pi logo — using a generic terminal/pi placeholder for now
+export const OmpIcon: Icon = ({ className, ...props }) => (
+  <svg
+    {...props}
+    viewBox="0 0 24 24"
+    fill="none"
+    className={cn("fill-[#0F0F0F] dark:fill-[#F5F5F5]", className)}
+  >
+    {/* Terminal prompt representing the Oh My Pi CLI */}
+    <rect x="2" y="3" width="20" height="18" rx="2" strokeWidth="1.5" stroke="currentColor" fill="none" />
+    <path d="M7 8L10 11L7 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M12 14H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
 export const TraeIcon: Icon = (props) => (
   <svg {...props} viewBox="0 0 24 24" fill="currentColor">
     {/* Back rectangle: left strip + bottom strip drawn separately — empty bottom-left corner is the gap between them */}
