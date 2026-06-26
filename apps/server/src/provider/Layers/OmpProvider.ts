@@ -42,7 +42,9 @@ const EMPTY_CAPABILITIES: ModelCapabilities = createModelCapabilities({
 });
 
 const VERSION_PROBE_TIMEOUT_MS = 4_000;
-const OMP_ACP_MODEL_DISCOVERY_TIMEOUT_MS = 15_000;
+// TODO(omp-recon): used by the ACP model-discovery block (commented until a
+// model is configured in omp and turn-level recon confirms the shape).
+const _OMP_ACP_MODEL_DISCOVERY_TIMEOUT_MS = 15_000;
 
 // TODO(omp-recon): real omp model ids — discover via ACP session setup currentModelId once recon confirms
 const OMP_BUILT_IN_MODELS: ReadonlyArray<ServerProviderModel> = [

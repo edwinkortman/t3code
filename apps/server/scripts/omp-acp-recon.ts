@@ -19,7 +19,7 @@
 //
 // Or simply: node scripts/omp-acp-recon.ts  (Node 24 auto-strips types)
 
-import * as NodeFSPromises from "node:fs/promises";
+import * as NodeFSP from "node:fs/promises";
 
 import * as Clock from "effect/Clock";
 import * as Effect from "effect/Effect";
@@ -101,7 +101,7 @@ const program = Effect.gen(function* () {
       Effect.gen(function* () {
         yield* log("HANDLER:fs/read_text_file", { path: req.path });
         const text = yield* Effect.tryPromise({
-          try: () => NodeFSPromises.readFile(req.path, "utf-8"),
+          try: () => NodeFSP.readFile(req.path, "utf-8"),
           catch: (err) =>
             AcpErrors.AcpRequestError.internalError(
               `fs/read_text_file failed: ${String(err)}`,
