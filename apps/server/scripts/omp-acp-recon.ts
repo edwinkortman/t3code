@@ -22,9 +22,6 @@
 import * as NodeFSPromises from "node:fs/promises";
 
 import * as Effect from "effect/Effect";
-import * as Layer from "effect/Layer";
-import * as Scope from "effect/Scope";
-import * as Exit from "effect/Exit";
 
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import * as NodeRuntime from "@effect/platform-node/NodeRuntime";
@@ -91,9 +88,6 @@ const program = Effect.gen(function* () {
         );
       }),
   });
-
-  const scope = yield* Scope.make();
-  const context = yield* Layer.buildWithScope(acpLayer, scope);
 
   const result = yield* Effect.gen(function* () {
     const acp = yield* EffectAcpClient.AcpClient;
@@ -250,7 +244,7 @@ const program = Effect.gen(function* () {
           : "default";
       log("STEP", `authenticate with methodId=${methodId}`);
       const authResult = yield* acp.agent.authenticate({ methodId }).pipe(
-        Effect.catchAll((err) =>
+        Effect.catch((err) =>
           Effect.sync(() => {
             log("WARN:authenticate:FAILED", err);
             return null;
@@ -288,9 +282,10 @@ const program = Effect.gen(function* () {
     log("RECON", "All steps complete.");
     return { initResult, sessionResult, promptResult };
   }).pipe(
-    Effect.provide(context),
-    Effect.ensuring(Scope.close(scope, Exit.void)),
-    Effect.catchAll((err) =>
+    // Provide the ACP client layer; it acquires its scoped resources from the
+    // ambient Scope supplied by Effect.scoped at the program boundary.
+    Effect.provide(acpLayer),
+    Effect.catch((err) =>
       Effect.sync(() => {
         log("ERROR", err);
         return null;
@@ -302,6 +297,10 @@ const program = Effect.gen(function* () {
   return result;
 });
 
+// Mirror apps/server/scripts/acp-mock-agent.ts:
+//   Effect.scoped provides the Scope that the spawner + ACP client layer need;
+//   NodeServices.layer provides ChildProcessSpawner, FileSystem, Path, Stdio,
+//   Terminal, Crypto; NodeRuntime.runMain manages the main fiber + interrupts.
 NodeRuntime.runMain(
-  program.pipe(Effect.provide(NodeServices.layer)),
+  program.pipe(Effect.scoped, Effect.provide(NodeServices.layer)),
 );
