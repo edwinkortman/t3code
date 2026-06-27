@@ -77,12 +77,17 @@ Verified the server handles all of this: effect-acp `schema.gen.ts` already know
 - **No model id over ACP.** session/new exposes only mode + thinking config
   options. omp picks the model from its own config / `/model`. OmpProvider's
   ACP model-discovery premise is invalid (comment updated; placeholder model kept).
-- **omp uses its own tools, not client fs/* callbacks.** The read surfaced as a
-  `tool_call (kind:read)`; ZERO `fs/read_text_file` handler calls fired. So the
-  "writes land in T3's diff viewer via fs/write_text_file" premise is likely
-  wrong — diffs will render through tool-call cards (as Codex/Grok do), not the
-  fs/write handler. STILL UNTESTED: a write/edit prompt, to capture the edit
-  tool_call payload shape and confirm it carries a diff the viewer renders.
+- **Reads internal, WRITES delegated to the client.** The read surfaced only as a
+  `tool_call (kind:read)` with ZERO `fs/read_text_file` callbacks — omp reads via
+  its own tool. But a write turn (create /tmp/omp-write-test.txt) produced BOTH:
+  (1) a `tool_call {kind:"edit", status:"pending", rawInput:{path,content},
+  locations:[{path}]}` — the diff card — and (2) a callback to
+  `fs/write_text_file({path, content})` on the client. So the original
+  diff-viewer premise HOLDS: omp hands writes to the client's fs/write handler,
+  which T3 Code's generic AcpSessionRuntime already routes into its diff/worktree
+  pipeline. No adapter code change needed. (The file stays absent in recon only
+  because the recon's fs/write handler is log-only.) No `session/request_permission`
+  fired for the edit — T3 gates at the diff boundary.
 
 ## Adapter implications
 - `acp/OmpAcpSupport.ts`: `OMP_AUTH_METHOD_ID = "agent"` is CONFIRMED (drop the

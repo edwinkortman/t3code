@@ -249,6 +249,9 @@ const program = Effect.gen(function* () {
 
     // ------------------------------------------------------------------
     // 5. prompt: "List the files in this repo and stop."
+    //    (A write variant — "Create /tmp/omp-write-test.txt ..." — confirmed
+    //    omp emits a tool_call kind:"edit" AND calls back fs/write_text_file;
+    //    see omp-recon-findings.md. Restored to the read prompt as the default.)
     // ------------------------------------------------------------------
     yield* log("STEP", `session/prompt sessionId=${sessionId}`);
     const promptResult = yield* acp.agent.prompt({
