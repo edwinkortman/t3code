@@ -42,15 +42,20 @@ const EMPTY_CAPABILITIES: ModelCapabilities = createModelCapabilities({
 });
 
 const VERSION_PROBE_TIMEOUT_MS = 4_000;
-// TODO(omp-recon): used by the ACP model-discovery block (commented until a
-// model is configured in omp and turn-level recon confirms the shape).
+// RECON RESULT: omp does NOT expose a model id over ACP. session/new returns
+// only `mode` (default|plan) and `thinking` (off|auto) config options — no
+// currentModelId, no model list. The model is chosen by omp's own config /
+// `/model` command. So ACP-based model discovery is not possible; this timeout
+// const is retained only as a placeholder and stays unused.
 const _OMP_ACP_MODEL_DISCOVERY_TIMEOUT_MS = 15_000;
 
-// TODO(omp-recon): real omp model ids — discover via ACP session setup currentModelId once recon confirms
+// RECON RESULT: model ids are not surfaced over ACP (see above). This single
+// built-in entry is a cosmetic placeholder; omp resolves the real model from
+// its own config. Do not attempt ACP discovery.
 const OMP_BUILT_IN_MODELS: ReadonlyArray<ServerProviderModel> = [
   {
-    slug: "omp-build", // TODO(omp-recon): replace with confirmed currentModelId fallback from sessionSetupResult
-    name: "Omp Build", // TODO(omp-recon): update display name once real model id confirmed
+    slug: "omp-default",
+    name: "Oh My Pi (configured model)",
     isCustom: false,
     capabilities: EMPTY_CAPABILITIES,
   },
