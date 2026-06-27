@@ -107,16 +107,13 @@ export function applyOmpAcpModelSelection<E>(input: {
   readonly requestedModelId: string | undefined;
   readonly mapError: (cause: EffectAcpErrors.AcpError) => E;
 }): Effect.Effect<string | undefined, E> {
-  // TODO(omp-recon): confirm omp supports in-session model switching via
-  // session/set_model before relying on this. If not supported, stub this out.
-  const shouldSwitchModel =
-    input.requestedModelId !== undefined && input.requestedModelId !== input.currentModelId;
-  if (!shouldSwitchModel) {
-    return Effect.succeed(input.currentModelId);
-  }
-  return input.runtime
-    .setSessionModel(input.requestedModelId)
-    .pipe(Effect.mapError(input.mapError), Effect.as(input.requestedModelId));
+  // RECON RESULT: omp does NOT expose model selection over ACP. session/new
+  // returns only `mode` + `thinking` config options and no model list, and
+  // calling session/set_model with any slug fails with -32603 (the model is
+  // chosen by omp's own config / `/model`). So this is intentionally a no-op:
+  // we never call setSessionModel and just let omp ride its configured model.
+  // (Driver capabilities advertise sessionModelSwitch: "unsupported".)
+  return Effect.succeed(input.currentModelId);
 }
 
 // TODO(omp-wave1): OmpAdapter (Layers/OmpAdapter.ts) and OmpProvider

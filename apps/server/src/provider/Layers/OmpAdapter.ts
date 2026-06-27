@@ -1400,9 +1400,10 @@ export function makeOmpAdapter(ompSettings: OmpSettings, options?: OmpAdapterLiv
     return {
       provider: PROVIDER,
       capabilities: {
-        // TODO(omp-recon): confirm omp supports in-session model switching via
-        // session/set_model before relying on this. If not supported, set "unsupported".
-        sessionModelSwitch: "in-session" as const,
+        // RECON RESULT: omp exposes no model selection over ACP (session/set_model
+        // fails -32603; model is omp-config-driven). Advertise unsupported so the
+        // UI doesn't offer an in-session model switch that would error.
+        sessionModelSwitch: "unsupported" as const,
       },
       startSession,
       sendTurn,
